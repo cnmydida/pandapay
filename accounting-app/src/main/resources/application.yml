@@ -1,0 +1,33 @@
+# Server settings
+server:
+    port:8080
+    address:localhost
+
+# DATASOURCE
+jdbc:
+    url: jdbc:postgresql://localhost:5432/pandapay
+    username: jerry
+    password: jerry
+
+# SPRING PROFILES
+spring:
+    # HTTP ENCODING
+    http:
+        encoding.charset: UTF-8
+        encoding.enable: true
+        encoding.force: true
+    # Data Source
+    # datasource:
+        # schema: V1__init.sql
+
+
+# MyBatis
+mybatis:
+    # typeAliasesPackage: org.pandapay.**.domain
+    # mapperLocations: classpath:/org/pandapay/**/mapper/*.xml
+    config: classpath:/mybatis-config.xml
+
+# LOGGING
+logging:
+    level:
+       com.ibatis:DEBUG
