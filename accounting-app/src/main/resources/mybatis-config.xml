@@ -6,7 +6,7 @@
     <typeAliases>
         <package name="org.pandapay.accounting.domain"/>
     </typeAliases>
-    <mappers>
+    <!--<mappers>
         <mapper resource="org/pandapay/accounting/mapper/CityMapper.xml"/>
-    </mappers>
+    </mappers>-->
 </configuration>

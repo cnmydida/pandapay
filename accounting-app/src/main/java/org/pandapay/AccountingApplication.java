@@ -1,5 +1,6 @@
 package org.pandapay;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.pandapay.accounting.mapper.CityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
+@MapperScan("org.pandapay.accounting.mapper")
 public class AccountingApplication implements CommandLineRunner {
 
     @Autowired
