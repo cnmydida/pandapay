@@ -1,8 +1,12 @@
 package org.pandapay.conf;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -21,12 +25,13 @@ import javax.sql.DataSource;
 public class DataBaseConfiguration implements EnvironmentAware {
 
     private RelaxedPropertyResolver propertyResolver;
-
+    private RelaxedPropertyResolver mybatisResolver;
     private static Logger log = LoggerFactory.getLogger(DataBaseConfiguration.class);
 
     @Override
     public void setEnvironment(Environment env) {
         this.propertyResolver = new RelaxedPropertyResolver(env, "jdbc.");
+        this.mybatisResolver = new RelaxedPropertyResolver(env, "mybatis.");
     }
 
     @Bean(destroyMethod = "close")
@@ -39,8 +44,14 @@ public class DataBaseConfiguration implements EnvironmentAware {
         ds.setJdbcUrl(propertyResolver.getProperty("url"));
         ds.setUsername(propertyResolver.getProperty("username"));
         ds.setPassword(propertyResolver.getProperty("password"));
-
+        ds.setAutoCommit(false);
         return ds;
     }
 
+    @Bean(destroyMethod = "getExecutorType")
+    @ConditionalOnMissingBean
+    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory,
+                ExecutorType.valueOf(mybatisResolver.getProperty("executorType")));
+    }
 }

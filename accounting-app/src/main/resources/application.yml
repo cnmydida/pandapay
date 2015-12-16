@@ -26,6 +26,7 @@ mybatis:
     # typeAliasesPackage: org.pandapay.**.domain
     # mapperLocations: classpath:/org/pandapay/**/mapper/*.xml
     config: classpath:/mybatis-config.xml
+    executorType: REUSE
 
 # LOGGING
 logging:

@@ -6,4 +6,11 @@
     <select id="selectCityById" resultType="City">
         select * from City where id = #{id}
     </select>
+    <update id="updateCity" parameterType="City">
+        update City set
+        name = #{name},
+        state = #{state},
+        country = #{country}
+        where id = #{id}
+    </update>
 </mapper>

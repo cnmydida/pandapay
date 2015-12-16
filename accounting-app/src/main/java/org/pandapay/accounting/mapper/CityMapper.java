@@ -9,5 +9,5 @@ import org.pandapay.accounting.domain.City;
 public interface CityMapper {
 
     City selectCityById(long id);
-
+    int updateCity(City city);
 }
