@@ -44,6 +44,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
         ds.setJdbcUrl(propertyResolver.getProperty("url"));
         ds.setUsername(propertyResolver.getProperty("username"));
         ds.setPassword(propertyResolver.getProperty("password"));
+        ds.setDriverClassName(propertyResolver.getProperty("driverClassName"));
         ds.setAutoCommit(false);
         return ds;
     }

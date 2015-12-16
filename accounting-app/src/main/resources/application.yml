@@ -5,7 +5,8 @@ server:
 
 # DATASOURCE
 jdbc:
-    url: jdbc:postgresql://localhost:5432/pandapay
+    url: jdbc:log4jdbc:postgresql://localhost:5432/pandapay
+    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     username: jerry
     password: jerry
 
@@ -31,4 +32,4 @@ mybatis:
 # LOGGING
 logging:
     level:
-       com.ibatis:DEBUG
+       org.mybatis:DEBUG

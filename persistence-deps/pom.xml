@@ -12,6 +12,7 @@
     <artifactId>persistence-deps</artifactId>
     <packaging>pom</packaging>
 
+
     <dependencies>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -26,7 +27,12 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <!--<version>9.4-1206-jdbc42</version>-->
+            <version>9.4-1206-jdbc42</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bgee.log4jdbc-log4j2</groupId>
+            <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+            <version>1.16</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
