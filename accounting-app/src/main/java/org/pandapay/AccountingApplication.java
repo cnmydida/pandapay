@@ -43,6 +43,7 @@ public class AccountingApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         City city = this.cityMapper.selectCityById(1);
         city.setName("ShenZhen 5");
+        System.out.println(city);
         this.cityMapper.updateCity(city);
         System.out.println(transactionManager);
 
