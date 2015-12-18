@@ -1,0 +1,3 @@
+# flyway settings
+flyway:
+    locations: db/h2

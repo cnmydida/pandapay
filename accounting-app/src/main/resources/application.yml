@@ -1,7 +1,7 @@
 # Server settings
 server:
-    port:8080
-    address:localhost
+    port: 8080
+    address: localhost
 
 # DATASOURCE
 jdbc:
@@ -10,7 +10,7 @@ jdbc:
     username: jerry
     password: jerry
 
-# SPRING PROFILES
+# SPRING settings
 spring:
     # HTTP ENCODING
     http:
@@ -21,6 +21,9 @@ spring:
     # datasource:
         # schema: V1__init.sql
 
+# Flyway settings
+flyway:
+    locations: db/migration
 
 # MyBatis
 mybatis:
@@ -32,4 +35,12 @@ mybatis:
 # LOGGING
 logging:
     level:
-       org.mybatis:DEBUG
+       org.mybatis: DEBUG
+
+# spring:
+    #    profiles: postgresqldb
+# jdbc:
+    #    url: jdbc:log4jdbc:postgresql://localhost:5432/pandapay
+    #    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    #    username: jerry
+    #    password: jerry
