@@ -11,6 +11,7 @@
 		<module>persistence-deps</module>
 		<module>persistence-core</module>
 		<module>accounting-app</module>
+		<module>pandapay-utils</module>
 	</modules>
 	<packaging>pom</packaging>
 
