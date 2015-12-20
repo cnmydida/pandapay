@@ -1,4 +1,4 @@
-package org.pandapay.utils;
+package org.pandapay.utils.impl;
 
 import java.util.Date;
 
