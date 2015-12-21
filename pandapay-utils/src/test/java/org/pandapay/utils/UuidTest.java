@@ -38,15 +38,15 @@ public class UuidTest {
         }
     }
 
-    @Test
-    public void testUuidGenerator()
-    {
-        IdManager idManager = new IdManagerImpl();
-        IdGenerator idGenerator = idManager.getIdGenerator("hello");
-        String uuid = idGenerator.nextID();
-
-        System.out.println(uuid);
-
-        assertTrue("larger than 0", uuid.toString().length() > 0);
-    }
+//    @Test
+//    public void testUuidGenerator()
+//    {
+//        IdManager idManager = new IdManagerImpl();
+//        IdGenerator idGenerator = idManager.getIdGenerator("hello");
+//        String uuid = idGenerator.nextID();
+//
+//        System.out.println(uuid);
+//
+//        assertTrue("larger than 0", uuid.toString().length() > 0);
+//    }
 }

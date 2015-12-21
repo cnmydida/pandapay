@@ -1,0 +1,20 @@
+# id manager configuration
+
+idManager:
+
+   account_no:
+
+      generator: uuid
+      isForDate: yes
+
+   entry_id:
+
+      generator: autoincrement
+      batch: 1000
+
+   fail_id:
+
+      generator: autoincrement
+      batch: 100
+      prefix: FAIL
+
