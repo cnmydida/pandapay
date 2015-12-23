@@ -9,12 +9,24 @@ idManager:
 
    entry_id:
 
-      generator: autoincrement
-      batch: 1000
+      generator: jdbc
+      batch: 100
 
    fail_id:
 
-      generator: autoincrement
+      generator: jdbc
       batch: 100
       prefix: FAIL
+
+# DATASOURCE
+jdbc:
+    url: jdbc:log4jdbc:postgresql://localhost:5432/pandapay
+    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    username: jerry
+    password: jerry
+
+# MyBatis
+mybatis:
+    config: classpath:/mybatis-config.xml
+    executorType: REUSE
 

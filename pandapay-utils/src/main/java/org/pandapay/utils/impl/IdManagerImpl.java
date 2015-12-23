@@ -55,16 +55,23 @@ public class IdManagerImpl extends ApplicationObjectSupport implements IdManager
     public IdGenerator getIdGenerator(String idType) {
 
 
-        Map<String, String> map = idGeneratorConfiguration.get(idType);
-        if (map != null)
+        Map<String, String> params = idGeneratorConfiguration.get(idType);
+        if (params != null)
         {
-            String generator = map.get("generator");
+            String generator = params.get("generator");
             if (generator != null)
             {
-                return idGenerators.get(generator);
+                IdGenerator idGenerator = idGenerators.get(generator);
+                idGenerator.setIdType(idType);
+                idGenerator.setParams(params);
+
+                return idGenerator;
             }
         }
-        return new UuidGenerator();
+        IdGenerator idGenerator = new UuidGenerator();
+        idGenerator.setIdType(idType);
+        idGenerator.setParams(params);
+        return idGenerator;
     }
 
 }

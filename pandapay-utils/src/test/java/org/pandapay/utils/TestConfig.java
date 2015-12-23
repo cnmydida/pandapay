@@ -1,6 +1,7 @@
 package org.pandapay.utils;
 
 import org.pandapay.utils.impl.IdManagerImpl;
+import org.pandapay.utils.impl.JdbcGenerator;
 import org.pandapay.utils.impl.UuidGenerator;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
@@ -28,6 +29,12 @@ public class TestConfig implements EnvironmentAware {
     IdGenerator idGenerator()
     {
         return new UuidGenerator();
+    }
+
+    @Bean(name = "jdbc")
+    IdGenerator jdbcIGenerator()
+    {
+        return new JdbcGenerator();
     }
 
     @Bean

@@ -2,7 +2,9 @@ package org.pandapay.utils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.pandapay.conf.DataBaseConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("unit-test")
-@SpringApplicationConfiguration(classes = TestConfig.class)
+@SpringApplicationConfiguration(classes = {TestConfig.class, DataBaseConfiguration.class})
 public class IdManagerTest {
 
     @Autowired
@@ -36,8 +38,18 @@ public class IdManagerTest {
     @Test
     public void testUuidGenerator()
     {
-        IdGenerator idGenerator = idManager.getIdGenerator("account_no");
+        IdGenerator<String> idGenerator = idManager.getIdGenerator("account_no");
         assertNotNull("not null", idGenerator);
         System.out.println(idGenerator.nextID());
     }
+
+    @Test
+    public void testJdbcGenerator()
+    {
+        IdGenerator<Long> idGenerator = idManager.getIdGenerator("entry_id");
+        assertNotNull("not null", idGenerator);
+        System.out.println(idGenerator.nextID());
+    }
+
+
 }
