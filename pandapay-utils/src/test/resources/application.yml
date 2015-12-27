@@ -4,17 +4,17 @@ idManager:
 
    account_no:
 
-      generator: uuid
+      generator: UUID
       isForDate: yes
 
    entry_id:
 
-      generator: jdbc
+      generator: JDBC
       batch: 100
 
    fail_id:
 
-      generator: jdbc
+      generator: INC
       batch: 100
       prefix: FAIL
 
@@ -30,3 +30,7 @@ mybatis:
     config: classpath:/mybatis-config.xml
     executorType: REUSE
 
+# flywaydb
+flyway:
+    enabled: false
+    checkLocation: false

@@ -1,6 +1,7 @@
 package org.pandapay.conf;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -8,6 +9,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
@@ -65,6 +67,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
         factory.setDataSource(dataSource());
+        factory.setDatabaseIdProvider(new VendorDatabaseIdProvider());
         if (StringUtils.hasText(this.mybatisResolver.getProperty("config"))) {
             factory.setConfigLocation(
                     this.resourceLoader.getResource(this.mybatisResolver.getProperty("config")));

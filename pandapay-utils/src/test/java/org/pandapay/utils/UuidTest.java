@@ -2,7 +2,6 @@ package org.pandapay.utils;
 
 import com.eaio.uuid.UUID;
 import org.junit.Test;
-import org.pandapay.utils.impl.IdManagerImpl;
 import org.pandapay.utils.impl.UuidUtils;
 
 import static org.junit.Assert.assertTrue;
@@ -38,15 +37,4 @@ public class UuidTest {
         }
     }
 
-//    @Test
-//    public void testUuidGenerator()
-//    {
-//        IdManager idManager = new IdManagerImpl();
-//        IdGenerator idGenerator = idManager.getIdGenerator("hello");
-//        String uuid = idGenerator.nextID();
-//
-//        System.out.println(uuid);
-//
-//        assertTrue("larger than 0", uuid.toString().length() > 0);
-//    }
 }

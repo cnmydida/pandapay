@@ -9,7 +9,4 @@ public interface IdGenerator<T> {
 
     T nextID();
 
-    void setIdType(String idType);
-
-    void setParams(Map<String, String> params);
 }
