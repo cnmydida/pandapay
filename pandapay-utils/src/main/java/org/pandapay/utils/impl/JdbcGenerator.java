@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -42,12 +43,9 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
     public Long nextID() {
         if (this.batchSize == 1) {
             return updateAndGetNextId();
-        }
-        else
-        {
+        } else {
             Long result = queue.poll();
-            while (result == null)
-            {
+            while (result == null) {
                 try {
                     semaphore.acquire();
                 } catch (InterruptedException e) {
@@ -70,13 +68,10 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
         this.batchSize = DEFAULT_BATCH_SIZE;
 
         String value = params.get(BATCH_KEY);
-        if (value != null)
-        {
+        if (value != null) {
             try {
                 batchSize = Integer.valueOf(value);
-            }
-            catch (NumberFormatException ex)
-            {
+            } catch (NumberFormatException ex) {
                 ;
             }
         }
@@ -90,68 +85,83 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
     }
 
 
-    private void acquireNextIds()
-    {
-        CountDownLatch doneSignal = new CountDownLatch(1);
-
-        Runnable run = new Runnable() {
+    private void acquireNextIds() {
+        Callable<Long> task = new Callable<Long>() {
             @Override
-            public void run() {
+            public Long call() throws Exception {
                 try {
-                    if (queue.peek() == null) {
+                    Long result = queue.peek();
+                    if (result == null) {
                         Long currentId = updateAndGetNextId();
                         Range<Long> longRange = Range.closedOpen(currentId - batchSize, currentId);
                         queue.addAll(ContiguousSet.create(longRange, DiscreteDomain.longs()));
+
+                        return currentId;
                     }
-                }
-                finally {
-                    doneSignal.countDown();
+                    return result;
+                } finally {
+
                     semaphore.release();
                 }
-
             }
+
+
         };
-        service.execute(run);
+        final Future<Long> taskResult = service.submit(task);
         try {
-            doneSignal.await();
+            Long result = taskResult.get();
+            if (result == null) {
+                throw new IdGenerateException("can not get next id.");
+            }
+        } catch (ExecutionException e) {
+            throw new IdGenerateException("can not get next id", e);
         } catch (InterruptedException e) {
-            ;
+            throw new IdGenerateException("can not get next id", e);
         }
     }
-    private String getDatabaseId()
-    {
+
+    private String getDatabaseId() {
         return sqlSessionTemplate.getConfiguration().getDatabaseId();
     }
 
-
-
     public Long updateAndGetNextId() {
-        System.out.println(this.getDatabaseId());
-
+        //System.out.println(this.getDatabaseId());//PostgreSQL
+        Long result = -1L;
         SqlSession sqlSession = SqlSessionUtils.getSqlSession(sqlSessionTemplate.getSqlSessionFactory(), sqlSessionTemplate.getExecutorType(), sqlSessionTemplate.getPersistenceExceptionTranslator());
-        //System.out.println("Database Id: " + sqlSession.getConfiguration().getDatabaseId());
         try {
-            PreparedStatement statement = sqlSession.getConnection().prepareStatement(UPDATE_AND_GET_KEY_SQL);
-            statement.setInt(1, this.batchSize);
-            statement.setString(2, this.idType);
+            switch (this.getDatabaseId()) {
+                case "PostgreSQL":
+                    result = postgreSQLNextId(sqlSession);
+                    break;
+                default:
+                    break;
 
-            boolean result = statement.execute();
 
-            if (result) {
-                ResultSet resultSet = statement.getResultSet();
-                resultSet.next();
-                Long nextId = resultSet.getLong(1);
-                sqlSession.commit(true);
-                return nextId;
             }
-        }
-        catch (Exception e)
-        {
+            sqlSession.commit(true);
+            return result;
+        } catch (Exception e) {
             sqlSession.rollback(true);
             throw new IdGenerateException("db exception occured.", e);
-        }
-        finally {
+        } finally {
             sqlSession.close();
+        }
+
+
+    }
+
+    private Long postgreSQLNextId(SqlSession sqlSession) throws SQLException {
+        PreparedStatement statement = sqlSession.getConnection().prepareStatement(UPDATE_AND_GET_KEY_SQL);
+        statement.setInt(1, this.batchSize);
+        statement.setString(2, this.idType);
+
+        boolean result = statement.execute();
+
+        if (result) {
+            ResultSet resultSet = statement.getResultSet();
+            resultSet.next();
+            Long nextId = resultSet.getLong(1);
+            return nextId;
         }
 
         throw new IdGenerateException("can not get id from database.");
