@@ -20,7 +20,9 @@ idManager:
 
 # DATASOURCE
 jdbc:
-    url: jdbc:log4jdbc:postgresql://localhost:5432/pandapay
+    # url: jdbc:log4jdbc:postgresql://localhost:5432/pandapay
+    # url: jdbc:log4jdbc:oracle:thin:@//localhost:1521/XE
+    url: jdbc:log4jdbc:h2:mem:sample;INIT=RUNSCRIPT FROM 'classpath:scripts/create.sql'
     driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     username: jerry
     password: jerry

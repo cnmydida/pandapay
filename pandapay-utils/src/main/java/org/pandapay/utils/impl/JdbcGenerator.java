@@ -11,9 +11,7 @@ import org.pandapay.utils.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -34,7 +32,10 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
     private static final String BATCH_KEY = "batch";
     private static final int DEFAULT_BATCH_SIZE = 1000;
 
-    private static final String UPDATE_AND_GET_KEY_SQL = "update ID_STORE set CURRENT_ID = CURRENT_ID + ? where ID_TYPE = ? returning CURRENT_ID";
+    private static final String POSTGRE_UPDATE_AND_GET_KEY_SQL = "update ID_STORE set CURRENT_ID = CURRENT_ID + ? where ID_TYPE = ? returning CURRENT_ID";
+    private static final String ORACLE_UPDATE_AND_GET_KEY_SQL = "update ID_STORE set CURRENT_ID = CURRENT_ID + ? where ID_TYPE = ? returning CURRENT_ID into ?";
+    private static final String GENERAL_UPDATE_SQL = "update ID_STORE set CURRENT_ID = CURRENT_ID + ? where ID_TYPE = ?";
+    private static final String GENERAL_SELECT_SQL = "select CURRENT_ID from ID_STORE where ID_TYPE = ?";
 
     @Autowired
     SqlSessionTemplate sqlSessionTemplate;
@@ -121,7 +122,8 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
     }
 
     private String getDatabaseId() {
-        return sqlSessionTemplate.getConfiguration().getDatabaseId();
+        String databaseId = sqlSessionTemplate.getConfiguration() == null ? "default" : sqlSessionTemplate.getConfiguration().getDatabaseId();
+        return databaseId == null ? "default" : databaseId;
     }
 
     public Long updateAndGetNextId() {
@@ -133,7 +135,11 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
                 case "PostgreSQL":
                     result = postgreSQLNextId(sqlSession);
                     break;
+                case "Oracle":
+                    result = oracleSQLNextId(sqlSession);
+                    break;
                 default:
+                    result = generalSQLNextId(sqlSession);
                     break;
 
 
@@ -151,7 +157,7 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
     }
 
     private Long postgreSQLNextId(SqlSession sqlSession) throws SQLException {
-        PreparedStatement statement = sqlSession.getConnection().prepareStatement(UPDATE_AND_GET_KEY_SQL);
+        PreparedStatement statement = sqlSession.getConnection().prepareStatement(POSTGRE_UPDATE_AND_GET_KEY_SQL);
         statement.setInt(1, this.batchSize);
         statement.setString(2, this.idType);
 
@@ -166,6 +172,43 @@ public class JdbcGenerator implements IdGenerator<Long>, IdGeneratorConfig {
 
         throw new IdGenerateException("can not get id from database.");
     }
+
+    private Long oracleSQLNextId(SqlSession sqlSession) throws SQLException {
+        CallableStatement statement = sqlSession.getConnection().prepareCall("{call " + ORACLE_UPDATE_AND_GET_KEY_SQL + "}");
+        statement.setInt(1, this.batchSize);
+        statement.setString(2, this.idType);
+        statement.registerOutParameter(3, Types.NUMERIC);
+
+        try {
+            statement.execute();
+            Long nextId = statement.getLong(3);
+            return nextId;
+        } catch (Exception e) {
+            throw new IdGenerateException("can not get id from database.", e);
+        }
+    }
+
+    private Long generalSQLNextId(SqlSession sqlSession) throws SQLException {
+        PreparedStatement statement = sqlSession.getConnection().prepareStatement(GENERAL_UPDATE_SQL);
+        statement.setInt(1, this.batchSize);
+        statement.setString(2, this.idType);
+
+        int noOfRow = statement.executeUpdate();
+
+        if (noOfRow == 1) {
+            statement = sqlSession.getConnection().prepareStatement(GENERAL_SELECT_SQL);
+            statement.setString(1, this.idType);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                Long nextId = resultSet.getLong(1);
+                return nextId;
+            }
+        }
+
+        throw new IdGenerateException("can not get id from database.");
+    }
+
 
     @Override
     public String toString() {
